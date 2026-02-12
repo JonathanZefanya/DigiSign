@@ -2,7 +2,7 @@
 
 DigiSign adalah platform manajemen dan penandatanganan dokumen digital berbasis web yang dibangun dengan **Laravel 12**. Aplikasi ini memungkinkan pengguna untuk mengunggah dokumen PDF, membubuhkan tanda tangan digital (QR Code), dan memverifikasi keaslian dokumen secara online.
 
-![DigiSign Dashboard](https://via.placeholder.com/800x400?text=DigiSign+Dashboard+Preview)
+![DigiSign Dashboard](public/assets/digisin.png)
 
 ## 🚀 Fitur Utama
 
