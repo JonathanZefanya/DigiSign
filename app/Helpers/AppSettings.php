@@ -71,4 +71,29 @@ class AppSettings
     {
         return Setting::get('registration_enabled', '1') === '1';
     }
+
+    /**
+     * Check if pricing display is enabled.
+     */
+    public static function isPricingEnabled(): bool
+    {
+        return Setting::get('show_pricing', '1') === '1';
+    }
+
+    /**
+     * Get currency symbol (default: Rp for Indonesian Rupiah).
+     */
+    public static function currencySymbol(): string
+    {
+        return Setting::get('currency_symbol', 'Rp');
+    }
+
+    /**
+     * Format price with currency symbol.
+     */
+    public static function formatPrice(float $price): string
+    {
+        $symbol = static::currencySymbol();
+        return $symbol . ' ' . number_format($price, 0, ',', '.');
+    }
 }

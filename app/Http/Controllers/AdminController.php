@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Document;
 use App\Models\Setting;
+use App\Models\SubscriptionPlan;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -80,6 +81,12 @@ class AdminController extends Controller
 
         // Toggle settings (checkbox sends value only when checked)
         Setting::set('registration_enabled', $request->boolean('registration_enabled') ? '1' : '0');
+        Setting::set('show_pricing', $request->boolean('show_pricing') ? '1' : '0');
+
+        // Currency symbol
+        if ($request->has('currency_symbol')) {
+            Setting::set('currency_symbol', $request->currency_symbol);
+        }
 
         // File settings
         if ($request->hasFile('app_logo')) {
@@ -162,7 +169,8 @@ class AdminController extends Controller
      */
     public function createUser()
     {
-        return view('admin.user-form', ['user' => null]);
+        $plans = SubscriptionPlan::orderBy('price')->get();
+        return view('admin.user-form', ['user' => null, 'plans' => $plans]);
     }
 
     /**
@@ -175,6 +183,7 @@ class AdminController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
             'role' => 'required|in:admin,user',
+            'current_plan_id' => 'nullable|exists:subscription_plans,id',
         ]);
 
         User::create([
@@ -183,6 +192,7 @@ class AdminController extends Controller
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'is_active' => true,
+            'current_plan_id' => $request->current_plan_id,
         ]);
 
         return redirect()->route('admin.users')
@@ -194,7 +204,8 @@ class AdminController extends Controller
      */
     public function editUser(User $user)
     {
-        return view('admin.user-form', compact('user'));
+        $plans = SubscriptionPlan::orderBy('price')->get();
+        return view('admin.user-form', compact('user', 'plans'));
     }
 
     /**
@@ -208,6 +219,7 @@ class AdminController extends Controller
             'password' => 'nullable|string|min:8',
             'role' => 'required|in:admin,user',
             'is_active' => 'boolean',
+            'current_plan_id' => 'nullable|exists:subscription_plans,id',
         ]);
 
         $data = [
@@ -215,6 +227,7 @@ class AdminController extends Controller
             'email' => $request->email,
             'role' => $request->role,
             'is_active' => $request->boolean('is_active', true),
+            'current_plan_id' => $request->current_plan_id,
         ];
 
         if ($request->filled('password')) {

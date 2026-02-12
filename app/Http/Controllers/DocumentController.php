@@ -49,7 +49,16 @@ class DocumentController extends Controller
             $q->where('user_id', auth()->id())->orWhereNull('user_id');
         })->active()->orderBy('name')->get();
 
-        return view('documents.index', compact('documents', 'categories'));
+        // Get documents pending user's signature (where user is recipient)
+        $pendingSignatures = \App\Models\Document::whereHas('recipients', function($q) {
+            $q->where('email', auth()->user()->email)
+              ->where('status', 'PENDING')
+              ->where('role', 'SIGNER');
+        })->with(['user', 'recipients' => function($q) {
+            $q->where('email', auth()->user()->email);
+        }])->latest()->get();
+
+        return view('documents.index', compact('documents', 'categories', 'pendingSignatures'));
     }
 
     /**
@@ -271,12 +280,23 @@ class DocumentController extends Controller
             abort(403);
         }
 
-        // Delete files from storage
+        $owner = $document->user;
+        $totalSizeKb = 0;
+
+        // Delete files from storage and calculate size
         if ($document->file_path && Storage::disk('public')->exists($document->file_path)) {
+            $totalSizeKb += (int) ceil(Storage::disk('public')->size($document->file_path) / 1024);
             Storage::disk('public')->delete($document->file_path);
         }
         if ($document->signed_file_path && Storage::disk('public')->exists($document->signed_file_path)) {
+            $totalSizeKb += (int) ceil(Storage::disk('public')->size($document->signed_file_path) / 1024);
             Storage::disk('public')->delete($document->signed_file_path);
+        }
+
+        // Decrement user's usage counters
+        if ($owner) {
+            $owner->decrementStorageUsage($totalSizeKb);
+            $owner->decrementDocumentCount();
         }
 
         $document->delete();

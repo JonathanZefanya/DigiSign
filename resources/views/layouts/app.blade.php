@@ -222,6 +222,11 @@
             color: #065f46;
         }
 
+        .ds-badge-pending {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
         .ds-badge-draft {
             background: #fef3c7;
             color: #92400e;
@@ -418,6 +423,13 @@
                             <a class="nav-link {{ request()->routeIs('documents.*') ? 'active' : '' }}"
                                href="{{ route('documents.index') }}">
                                 <i class="bi bi-file-earmark-pdf"></i> My Documents
+                                @if(($pendingSignaturesCount ?? 0) > 0)
+                                    <span class="badge bg-danger rounded-pill ms-1" 
+                                          style="font-size: 0.7rem; padding: 0.25rem 0.5rem;"
+                                          title="{{ $pendingSignaturesCount }} document(s) pending your signature">
+                                        {{ $pendingSignaturesCount }}
+                                    </span>
+                                @endif
                             </a>
                         </li>
                         <li class="nav-item">
@@ -430,6 +442,12 @@
                             <a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}"
                                href="{{ route('categories.index') }}">
                                 <i class="bi bi-bookmarks"></i> My Categories
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('plan.*') ? 'active' : '' }}"
+                               href="{{ route('plan.index') }}">
+                                <i class="bi bi-box-seam"></i> My Plan
                             </a>
                         </li>
                         @if(auth()->user()->isAdmin())
@@ -450,6 +468,11 @@
                                         </a>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item" href="{{ route('admin.plans.index') }}">
+                                            <i class="bi bi-card-list"></i> Manage Plans
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item" href="{{ route('admin.categories.index') }}">
                                             <i class="bi bi-bookmarks me-2"></i> Document Categories
                                         </a>
@@ -463,6 +486,11 @@
                                     <li>
                                         <a class="dropdown-item" href="{{ route('admin.settings') }}">
                                             <i class="bi bi-sliders me-2"></i> Settings
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('admin.smtp.index') }}">
+                                            <i class="bi bi-journal-text me-2"></i> SMTP
                                         </a>
                                     </li>
                                 </ul>
@@ -482,7 +510,7 @@
                             <button type="submit" class="btn btn-outline-light btn-sm" title="Logout">
                                 <i class="bi bi-box-arrow-right"></i> Logout
                             </button>
-                        </form>
+                        </form>c
                     </div>
                 @else
                     <ul class="navbar-nav ms-auto">

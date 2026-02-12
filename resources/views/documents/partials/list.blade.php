@@ -9,6 +9,8 @@
                             <span class="ds-badge ds-badge-{{ $document->status }}" onclick="filterStatus('{{ $document->status }}')" style="cursor:pointer;" title="Filter by status">
                                 @if($document->status === 'signed')
                                     <i class="bi bi-check-circle-fill me-1"></i> Signed
+                                @elseif($document->status === 'pending')
+                                    <i class="bi bi-hourglass-split me-1"></i> Pending
                                 @elseif($document->status === 'draft')
                                     <i class="bi bi-pencil me-1"></i> Draft
                                 @else

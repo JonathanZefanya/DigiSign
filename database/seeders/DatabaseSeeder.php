@@ -12,6 +12,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Seed subscription plans first (needed for user creation)
+        $this->call(SubscriptionPlanSeeder::class);
+
         // Create Admin User
         User::updateOrCreate(
             ['email' => 'admin@digisign.local'],

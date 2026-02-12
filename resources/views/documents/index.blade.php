@@ -9,9 +9,72 @@
         </h1>
         <p class="text-muted mb-0">Manage and sign your PDF documents</p>
     </div>
-    <a href="{{ route('documents.create') }}" class="btn btn-primary btn-lg" id="uploadNewBtn">
-        <i class="bi bi-cloud-upload"></i> Upload New Document
-    </a>
+    <div class="d-flex gap-2">
+        <a href="{{ route('documents.create') }}" class="btn btn-outline-primary btn-lg">
+            <i class="bi bi-cloud-upload"></i> Upload & Sign
+        </a>
+        <a href="{{ route('documents.send.form') }}" class="btn btn-primary btn-lg" id="sendDocumentBtn">
+            <i class="bi bi-send"></i> Send Document
+        </a>
+    </div>
+</div>
+
+{{-- Documents Pending Your Signature --}}
+@if($pendingSignatures->isNotEmpty())
+    <div class="alert alert-info border-0 shadow-sm ds-animate ds-animate-delay-1 mb-4" style="background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);">
+        <div class="d-flex align-items-start">
+            <div class="flex-shrink-0">
+                <div style="width: 48px; height: 48px; background: #3b82f6; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-pencil-square text-white" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+                <h5 class="fw-bold mb-2" style="color: #1e40af;">
+                    <i class="bi bi-inbox"></i> Documents Pending Your Signature
+                    <span class="badge bg-primary ms-2">{{ $pendingSignatures->count() }}</span>
+                </h5>
+                <p class="mb-3 text-muted">The following documents require your signature:</p>
+                
+                <div class="row g-3">
+                    @foreach($pendingSignatures as $doc)
+                        @php
+                            $recipient = $doc->recipients->first();
+                        @endphp
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="fw-bold mb-0">{{ Str::limit($doc->title, 35) }}</h6>
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-clock"></i> Pending
+                                        </span>
+                                    </div>
+                                    <p class="text-muted small mb-2">
+                                        <i class="bi bi-person"></i> From: <strong>{{ $doc->user->name }}</strong>
+                                    </p>
+                                    <p class="text-muted small mb-3">
+                                        <i class="bi bi-calendar3"></i> {{ $doc->created_at->diffForHumans() }}
+                                    </p>
+                                    <a href="{{ route('documents.sign.token', $recipient->signature_token) }}" 
+                                       class="btn btn-primary btn-sm w-100">
+                                        <i class="bi bi-pen"></i> Sign Now
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+@endif
+
+{{-- Section Divider --}}
+<div class="d-flex align-items-center mb-4 ds-animate ds-animate-delay-2">
+    <h4 class="fw-bold mb-0 me-3">
+        <i class="bi bi-folder2-open text-primary"></i> My Uploaded Documents
+    </h4>
+    <hr class="flex-grow-1">
 </div>
 
 {{-- Filters --}}
@@ -34,6 +97,7 @@
         <select id="statusFilter" class="form-select">
             <option value="">All Statuses</option>
             <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
+            <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending Signature</option>
             <option value="signed" {{ request('status') === 'signed' ? 'selected' : '' }}>Signed</option>
             <option value="revoked" {{ request('status') === 'revoked' ? 'selected' : '' }}>Revoked</option>
         </select>

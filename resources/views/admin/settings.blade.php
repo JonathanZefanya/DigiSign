@@ -116,8 +116,71 @@
             </div>
         </div>
 
-        {{-- Branding --}}
+        {{-- Pricing & Currency Settings --}}
         <div class="col-lg-6 ds-animate ds-animate-delay-2">
+            <div class="ds-card">
+                <div class="card-header">
+                    <i class="bi bi-currency-exchange me-2"></i>Pricing & Currency
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <label class="form-label d-block">
+                            <i class="bi bi-cash-stack me-1"></i> Show Pricing
+                        </label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch"
+                                   id="show_pricing" name="show_pricing" value="1"
+                                   {{ ($settings['show_pricing'] ?? '1') === '1' ? 'checked' : '' }}
+                                   style="width:3rem;height:1.5rem;cursor:pointer;"
+                                   onchange="document.getElementById('pricingStatusText').textContent = this.checked ? 'Enabled' : 'Disabled'; document.getElementById('pricingStatusText').className = this.checked ? 'text-success' : 'text-danger';">
+                            <label class="form-check-label fw-semibold ms-2" for="show_pricing" style="cursor:pointer;line-height:1.5rem;">
+                                <span id="pricingStatusText" class="{{ ($settings['show_pricing'] ?? '1') === '1' ? 'text-success' : 'text-danger' }}">
+                                    {{ ($settings['show_pricing'] ?? '1') === '1' ? 'Enabled' : 'Disabled' }}
+                                </span>
+                            </label>
+                        </div>
+                        <div class="form-text mt-1">
+                            <i class="bi bi-info-circle me-1"></i>
+                            When disabled, plan prices will be hidden from users. Useful if you want to show only features without pricing.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="currency_symbol" class="form-label">
+                            <i class="bi bi-currency-dollar me-1"></i> Currency Symbol
+                        </label>
+                        <select class="form-select form-select-lg @error('currency_symbol') is-invalid @enderror"
+                                id="currency_symbol" name="currency_symbol">
+                            @php
+                                $currencies = [
+                                    'Rp' => 'Rp - Indonesian Rupiah',
+                                    '$' => '$ - US Dollar',
+                                    '€' => '€ - Euro',
+                                    '£' => '£ - British Pound',
+                                    '¥' => '¥ - Japanese Yen / Chinese Yuan',
+                                    '₹' => '₹ - Indian Rupee',
+                                    'RM' => 'RM - Malaysian Ringgit',
+                                    '฿' => '฿ - Thai Baht',
+                                ];
+                                $currentCurrency = $settings['currency_symbol'] ?? 'Rp';
+                            @endphp
+                            @foreach($currencies as $symbol => $label)
+                                <option value="{{ $symbol }}" {{ $currentCurrency === $symbol ? 'selected' : '' }}>
+                                    {{ $label }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="form-text">Select the currency symbol to display for plan prices.</div>
+                        @error('currency_symbol')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Branding --}}
+        <div class="col-lg-6 ds-animate ds-animate-delay-3">
             <div class="ds-card">
                 <div class="card-header">
                     <i class="bi bi-palette me-2"></i>Branding
@@ -173,7 +236,7 @@
         </div>
 
         {{-- SSO Settings --}}
-        <div class="col-lg-12 ds-animate ds-animate-delay-3">
+        <div class="col-lg-12 ds-animate ds-animate-delay-4">
             <div class="ds-card">
                 <div class="card-header">
                     <i class="bi bi-key me-2"></i>SSO Integration
@@ -223,18 +286,18 @@
         </div>
 
         {{-- SSO Provider Settings --}}
-        <div class="col-lg-12 ds-animate ds-animate-delay-4">
+        <div class="col-lg-12 ds-animate ds-animate-delay-5">
             <div class="ds-card">
                 <div class="card-header bg-primary text-white">
                     <i class="bi bi-broadcast me-2"></i>SSO Provider (Integration for Other Apps)
                 </div>
                 <div class="card-body">
-                    <p class="text-muted mb-4">Allow other applications (like Web-Tools) to use DigiSign for authentication.</p>
+                    <p class="text-muted mb-4">Allow other applications to use DigiSign for authentication.</p>
                     
                     <div class="alert alert-info">
-                        <strong><i class="bi bi-info-circle me-1"></i> How to integrate with Web-Tools:</strong>
+                        <strong><i class="bi bi-info-circle me-1"></i> How to integrate with Jonathan Software:</strong>
                         <ol class="mb-0 mt-2 small">
-                            <li>In Web-Tools, go to <strong>Settings → SSO</strong></li>
+                            <li>In Jonathan Software, go to <strong>Settings → SSO</strong></li>
                             <li>Enable SSO and create a new website entry</li>
                             <li>Set <strong>URL</strong> to the Base URL below</li>
                             <li>Set <strong>API Key</strong> to the Shared Secret API Key below</li>
@@ -242,7 +305,7 @@
                         </ol>
                         <div class="mt-2 p-2 bg-white rounded border">
                             <small class="text-muted"><strong>Technical Details:</strong></small><br>
-                            <small class="text-muted">Web-Tools will send POST to: <code>{Base_URL}/admin-api/sso/login</code> with Bearer token and user info (email, name). DigiSign will create/login the user and return a signed URL for auto-login.</small>
+                            <small class="text-muted">Jonathan Software will send POST to: <code>{Base_URL}/admin-api/sso/login</code> with Bearer token and user info (email, name). DigiSign will create/login the user and return a signed URL for auto-login.</small>
                         </div>
                     </div>
                     
@@ -255,7 +318,7 @@
                                     <i class="bi bi-clipboard"></i>
                                 </button>
                             </div>
-                            <div class="form-text">Use this as the <strong>URL</strong> field in Web-Tools SSO settings.</div>
+                            <div class="form-text">Use this as the <strong>URL</strong> field in Jonathan Software SSO settings.</div>
                         </div>
                         
                         <div class="col-md-6">
@@ -269,7 +332,7 @@
                                     <i class="bi bi-clipboard"></i>
                                 </button>
                             </div>
-                            <div class="form-text">Use this as the <strong>API Key</strong> field in Web-Tools SSO settings.</div>
+                            <div class="form-text">Use this as the <strong>API Key</strong> field in Jonathan Software SSO settings.</div>
                         </div>
                     </div>
                 </div>
@@ -278,7 +341,7 @@
     </div>
 
     {{-- Submit --}}
-    <div class="mt-5 mb-5 ds-animate ds-animate-delay-5">
+    <div class="mt-5 mb-5 ds-animate ds-animate-delay-6">
         <div class="card border-0 shadow-sm">
             <div class="card-body p-4 d-flex flex-wrap gap-3 justify-content-between align-items-center bg-light rounded">
                 <div>

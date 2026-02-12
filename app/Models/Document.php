@@ -49,4 +49,73 @@ class Document extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function recipients()
+    {
+        return $this->hasMany(DocumentRecipient::class);
+    }
+
+    public function signers()
+    {
+        return $this->recipients()->where('role', 'SIGNER');
+    }
+
+    public function viewers()
+    {
+        return $this->recipients()->where('role', 'VIEWER');
+    }
+
+    /**
+     * Check if all signers have signed
+     */
+    public function allSignersSigned(): bool
+    {
+        $signers = $this->signers()->get();
+        
+        if ($signers->isEmpty()) {
+            return false;
+        }
+        
+        return $signers->every(function ($signer) {
+            return $signer->status === 'SIGNED';
+        });
+    }
+
+    /**
+     * Check if any signer has rejected
+     */
+    public function anySignerRejected(): bool
+    {
+        return $this->signers()->where('status', 'REJECTED')->exists();
+    }
+
+    /**
+     * Update document status based on recipient statuses
+     */
+    public function updateStatusFromRecipients()
+    {
+        if ($this->anySignerRejected()) {
+            $this->update(['status' => 'rejected']);
+        } elseif ($this->allSignersSigned()) {
+            $this->update([
+                'status' => 'signed',
+                'signed_at' => now(),
+            ]);
+        } elseif ($this->signers()->where('status', 'SIGNED')->exists()) {
+            $this->update(['status' => 'partial']);
+        }
+    }
+
+    /**
+     * Get file size in KB
+     */
+    public function getFileSizeKb(): int
+    {
+        $path = storage_path('app/' . $this->file_path);
+        if (file_exists($path)) {
+            return (int) ceil(filesize($path) / 1024);
+        }
+        return 0;
+    }
 }
+

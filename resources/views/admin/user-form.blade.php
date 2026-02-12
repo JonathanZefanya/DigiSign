@@ -97,6 +97,34 @@
                         @enderror
                     </div>
 
+                    <div class="mb-4">
+                        <label for="current_plan_id" class="form-label">
+                            <i class="bi bi-box-seam me-1"></i> Subscription Plan
+                        </label>
+                        <select class="form-select form-select-lg @error('current_plan_id') is-invalid @enderror"
+                                id="current_plan_id" name="current_plan_id">
+                            <option value="">— Select a plan —</option>
+                            @foreach($plans as $plan)
+                                <option value="{{ $plan->id }}" 
+                                        {{ old('current_plan_id', $user?->current_plan_id) == $plan->id ? 'selected' : '' }}>
+                                    {{ $plan->name }} 
+                                    @if($plan->price > 0)
+                                        — ${{ number_format($plan->price, 2) }}/month
+                                    @else
+                                        — Free
+                                    @endif
+                                    ({{ $plan->storage_limit_mb == -1 ? 'Unlimited' : $plan->storage_limit_mb . ' MB' }}, {{ $plan->max_documents_per_month == -1 ? 'Unlimited' : $plan->max_documents_per_month . ' docs/month' }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('current_plan_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <div class="form-text">
+                            <i class="bi bi-info-circle"></i> Leave empty to auto-assign Free plan (for new users)
+                        </div>
+                    </div>
+
                     @if($user)
                         <div class="mb-4">
                             <div class="form-check form-switch">
