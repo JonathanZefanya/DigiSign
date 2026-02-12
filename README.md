@@ -41,7 +41,7 @@ Ikuti langkah-langkah di bawah ini untuk menginstal proyek di local environment:
 
 1.  **Clone Repository**
     ```bash
-    git clone https://github.com/username/digisign.git
+    git clone https://github.com/jonathanzefanya/digisign.git
     cd digisign
     ```
 
