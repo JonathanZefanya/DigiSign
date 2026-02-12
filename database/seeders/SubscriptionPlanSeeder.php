@@ -25,45 +25,6 @@ class SubscriptionPlanSeeder extends Seeder
             ]
         );
 
-        // Create Basic Plan
-        SubscriptionPlan::firstOrCreate(
-            ['name' => 'Basic Plan'],
-            [
-                'storage_limit_mb' => 500,
-                'max_documents_per_month' => 50,
-                'max_categories' => 15,
-                'price' => 150000,
-                'is_default' => false,
-                'description' => 'Ideal for small businesses and teams',
-            ]
-        );
-
-        // Create Professional Plan
-        SubscriptionPlan::firstOrCreate(
-            ['name' => 'Professional Plan'],
-            [
-                'storage_limit_mb' => 2048,
-                'max_documents_per_month' => 200,
-                'max_categories' => 50,
-                'price' => 450000,
-                'is_default' => false,
-                'description' => 'For power users and growing companies',
-            ]
-        );
-
-        // Create Enterprise Plan
-        SubscriptionPlan::firstOrCreate(
-            ['name' => 'Enterprise Plan'],
-            [
-                'storage_limit_mb' => 10240,
-                'max_documents_per_month' => 1000,
-                'max_categories' => 200,
-                'price' => 1500000,
-                'is_default' => false,
-                'description' => 'Unlimited power for large organizations',
-            ]
-        );
-
         $this->command->info('Subscription plans seeded successfully!');
     }
 }
